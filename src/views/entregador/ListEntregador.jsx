@@ -5,6 +5,7 @@ import {
   Button,
   Container,
   Divider,
+  Header,
   Icon,
   Modal,
   Table,
@@ -15,6 +16,8 @@ export default function ListEntregador() {
   const [lista, setLista] = useState([]);
   const [entregadorSelecionado, setEntregadorSelecionado] = useState(null);
   const [modalAberto, setModalAberto] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [idRemover, setIdRemover] = useState();
 
   useEffect(() => {
     carregarLista();
@@ -43,6 +46,26 @@ export default function ListEntregador() {
     setEntregadorSelecionado(null);
     setModalAberto(false);
   }
+  function confirmaRemover(id) {
+    setOpenModal(true);
+    setIdRemover(id);
+  }
+  async function remover() {
+    await axios
+      .delete("http://localhost:8080/api/entregador/" + idRemover)
+      .then((response) => {
+        console.log("Entregador removido com sucesso.");
+
+        axios.get("http://localhost:8080/api/entregador").then((response) => {
+          setLista(response.data);
+        });
+      })
+      .catch((error) => {
+        console.log("Erro ao remover um entregador.");
+      });
+    setOpenModal(false);
+  }
+
   return (
     <div>
       <MenuSistema tela={"entregador"} />
@@ -79,7 +102,7 @@ export default function ListEntregador() {
 
               <Table.Body>
                 {lista.map((entregador) => (
-                  <Table.Row key={entregador.nome}>
+                  <Table.Row key={entregador.id}>
                     <Table.Cell>{entregador.nome}</Table.Cell>
                     <Table.Cell>{entregador.rg}</Table.Cell>
                     <Table.Cell>{entregador.foneCelular}</Table.Cell>
@@ -93,7 +116,14 @@ export default function ListEntregador() {
                         title="Clique aqui para editar os dados deste entregador"
                         icon
                       >
-                        <Icon name="edit" />
+                        <Link
+                          to="/form-entregador"
+                          state={{ id: entregador.id }}
+                          style={{ color: "green" }}
+                        >
+                          {" "}
+                          <Icon name="edit" />{" "}
+                        </Link>
                       </Button>{" "}
                       &nbsp;
                       <Button
@@ -102,6 +132,7 @@ export default function ListEntregador() {
                         color="red"
                         title="Clique aqui para remover este entregador"
                         icon
+                        onClick={(e) => confirmaRemover(entregador.id)}
                       >
                         <Icon name="trash" />
                       </Button>
@@ -124,134 +155,30 @@ export default function ListEntregador() {
           </div>
         </Container>
       </div>
-      {/* Modal de Detalhes */}
-      <Modal open={modalAberto} onClose={fecharModal} size="small">
-        <Modal.Header>Detalhes do Entregador</Modal.Header>
-        <Modal.Content>
-          {entregadorSelecionado && (
-            <Table celled striped>
-              <Table.Body>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Nome</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.nome}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>CPF</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.cpf}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>RG</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.rg}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Data Nascimento</strong>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {entregadorSelecionado.dataNascimento
-                      ? new Date(
-                          entregadorSelecionado.dataNascimento
-                        ).toLocaleDateString("pt-BR")
-                      : ""}
-                  </Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Fone Celular</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.foneCelular}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Fone Fixo</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.foneFixo}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>QTD Entregas Realizadas</strong>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {entregadorSelecionado.qtdEntregasRealizadas}
-                  </Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Valor Por Frete</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.valor_frete}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Rua</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.endereco?.rua}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Número</strong>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {entregadorSelecionado.endereco?.numero}
-                  </Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Bairro</strong>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {entregadorSelecionado.endereco?.bairro}
-                  </Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Cidade</strong>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {entregadorSelecionado.endereco?.cidade}
-                  </Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>CEP</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.endereco?.cep}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>UF</strong>
-                  </Table.Cell>
-                  <Table.Cell>{entregadorSelecionado.endereco?.uf}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Complemento</strong>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {entregadorSelecionado.endereco?.complemento}
-                  </Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    <strong>Ativo</strong>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {entregadorSelecionado.ativo ? "Sim" : "Não"}
-                  </Table.Cell>
-                </Table.Row>
-              </Table.Body>
-            </Table>
-          )}
-        </Modal.Content>
+      <Modal
+        basic
+        onClose={() => setOpenModal(false)}
+        onOpen={() => setOpenModal(true)}
+        open={openModal}
+      >
+        <Header icon>
+          <Icon name="trash" />
+          <div style={{ marginTop: "5%" }}>
+            {" "}
+            Tem certeza que deseja remover esse registro?{" "}
+          </div>
+        </Header>
         <Modal.Actions>
-          <Button onClick={fecharModal} color="red">
-            <Icon name="close" /> Fechar
+          <Button
+            basic
+            color="red"
+            inverted
+            onClick={() => setOpenModal(false)}
+          >
+            <Icon name="remove" /> Não
+          </Button>
+          <Button color="green" inverted onClick={() => remover()}>
+            <Icon name="checkmark" /> Sim
           </Button>
         </Modal.Actions>
       </Modal>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import InputMask from "comigo-tech-react-input-mask";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -10,7 +10,7 @@ import {
   Icon,
 } from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function FormEntregador() {
   const [nome, setNome] = useState();
@@ -29,6 +29,33 @@ export default function FormEntregador() {
   const [uf, setUf] = useState();
   const [complemento, setComplemento] = useState();
   const [ativo, setAtivo] = useState(false);
+  const { state } = useLocation();
+  const [idEntregador, setIdEntregador] = useState();
+
+  useEffect(() => {
+    if (state != null && state.id != null) {
+      axios
+        .get("http://localhost:8080/api/cliente/" + state.id)
+        .then((response) => {
+          setIdEntregador(response.data.id);
+          setNome(response.data.nome);
+          setCpf(response.data.cpf);
+          setRg(response.data.rg);
+          setDataNascimento(response.data.dataNascimento);
+          setFoneCelular(response.data.foneCelular);
+          setFoneFixo(response.data.foneFixo);
+          setQtdEntregasRealizadas(response.data.qtdEntregasRealizadas);
+          setValorPorFrete(response.data.valorPorFrete);
+          setRua(response.data.rua);
+          setNumero(response.data.numero);
+          setBairro(response.data.bairro);
+          setCidade(response.data.cidade);
+          setCep(response.data.cep);
+          setUf(response.data.uf);
+          setComplemento(response.data.complemento);
+        });
+    }
+  }, [state]);
 
   function salvar() {
     let entregadorRequest = {
@@ -50,14 +77,30 @@ export default function FormEntregador() {
       ativo: ativo,
     };
 
-    axios
-      .post("http://localhost:8080/api/entregador", entregadorRequest)
-      .then((Response) => {
-        console.log("Entregador cadastrado com sucesso!");
-      })
-      .catch((error) => {
-        console.log("Erro ao cadastrar o entregador.");
-      });
+    if (idEntregador != null) {
+      //Alteração:
+      axios
+        .put(
+          "http://localhost:8080/api/entregador/" + idEntregador,
+          entregadorRequest
+        )
+        .then((response) => {
+          console.log("Entregador alterado com sucesso.");
+        })
+        .catch((error) => {
+          console.log("Erro ao alter um entregador.");
+        });
+    } else {
+      //Cadastro:
+      axios
+        .post("http://localhost:8080/api/entregador", entregadorRequest)
+        .then((response) => {
+          console.log("Entregador cadastrado com sucesso.");
+        })
+        .catch((error) => {
+          console.log("Erro ao incluir o entregador.");
+        });
+    }
   }
   return (
     <div>
@@ -88,14 +131,13 @@ export default function FormEntregador() {
                   onChange={(e) => setNome(e.target.value)}
                 />
 
-                <Form.Input
-                  required
-                  fluid
-                  label="CPF"
-                  value={cpf}
-                  onChange={(e) => setCpf(e.target.value)}
-                >
-                  <InputMask required mask="999.999.999-99" />
+                <Form.Input required fluid label="CPF">
+                  <InputMask
+                    required
+                    mask="999.999.999-99"
+                    value={cpf}
+                    onChange={(e) => setCpf(e.target.value)}
+                  />
                 </Form.Input>
 
                 <Form.Input
@@ -108,36 +150,28 @@ export default function FormEntregador() {
               </Form.Group>
 
               <Form.Group widths="equal">
-                <Form.Input
-                  fluid
-                  label="Data Nascimento"
-                  width={6}
-                  value={dataNascimento}
-                  onChange={(e) => setDataNascimento(e.target.value)}
-                >
+                <Form.Input fluid label="Data Nascimento" width={6}>
                   <InputMask
                     mask="99/99/9999"
                     maskChar={null}
                     placeholder="Ex: 20/03/1985"
+                    value={dataNascimento}
+                    onChange={(e) => setDataNascimento(e.target.value)}
                   />
                 </Form.Input>
-                <Form.Input
-                  fluid
-                  label="Fone Celular"
-                  width={6}
-                  value={foneCelular}
-                  onChange={(e) => setFoneCelular(e.target.value)}
-                >
-                  <InputMask mask="(99) 9999.9999" />
+                <Form.Input fluid label="Fone Celular" width={6}>
+                  <InputMask
+                    mask="(99) 9999.9999"
+                    value={foneCelular}
+                    onChange={(e) => setFoneCelular(e.target.value)}
+                  />
                 </Form.Input>
-                <Form.Input
-                  fluid
-                  label="Fone Fixo"
-                  width={6}
-                  value={foneFixo}
-                  onChange={(e) => setFoneFixo(e.target.value)}
-                >
-                  <InputMask mask="(99) 9999.9999" />
+                <Form.Input fluid label="Fone Fixo" width={6}>
+                  <InputMask
+                    mask="(99) 9999.9999"
+                    value={foneFixo}
+                    onChange={(e) => setFoneFixo(e.target.value)}
+                  />
                 </Form.Input>
 
                 <Form.Input
@@ -146,9 +180,9 @@ export default function FormEntregador() {
                   value={qtdEntregasRealizadas}
                   onChange={(e) => setQtdEntregasRealizadas(e.target.value)}
                 />
-                <Form.Input
-                  fluid
-                  label="Valor Por Frete"
+                <Form.Input fluid label="Valor Por Frete" />
+                <InputMask
+                  mask="99.99"
                   value={valorPorFrete}
                   onChange={(e) => setValorPorFrete(e.target.value)}
                 />

@@ -1,9 +1,9 @@
 import axios from "axios";
 import InputMask from "comigo-tech-react-input-mask";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Container, Divider, Form, Icon } from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function FormProduto() {
   const [codigo, setCodigo] = useState();
@@ -12,6 +12,24 @@ export default function FormProduto() {
   const [valorUnitario, setValorUnitario] = useState();
   const [tempoEntregaMinimo, setTempoEntregaMinimo] = useState();
   const [tempoEntregaMaximo, setTempoEntregaMaximo] = useState();
+  const { state } = useLocation();
+  const [idProduto, setIdProduto] = useState();
+
+  useEffect(() => {
+    if (state != null && state.id != null) {
+      axios
+        .get("http://localhost:8080/api/produto/" + state.id)
+        .then((response) => {
+          setIdProduto(response.data.id);
+          setCodigo(response.data.codigo);
+          setTitulo(response.data.titulo);
+          setDescricao(response.data.descricao);
+          setValorUnitario(response.data.valorUnitario);
+          setTempoEntregaMinimo(response.data.tempoEntregaMinimo);
+          setTempoEntregaMaximo(response.data.tempoEntregaMaximo);
+        });
+    }
+  }, [state]);
 
   function salvar() {
     let produtoRequest = {
@@ -22,14 +40,27 @@ export default function FormProduto() {
       tempoEntregaMinimo: tempoEntregaMinimo,
       tempoEntregaMaximo: tempoEntregaMaximo,
     };
-    axios
-      .post("http://localhost:8080/api/produto", produtoRequest)
-      .then((Response) => {
-        console.log("Produto cadastrado com sucesso!");
-      })
-      .catch((error) => {
-        console.log("Erro ao cadastrar o produto.");
-      });
+    if (idProduto != null) {
+      //Alteração:
+      axios
+        .put("http://localhost:8080/api/produto/" + idProduto, produtoRequest)
+        .then((response) => {
+          console.log("produto alterado com sucesso.");
+        })
+        .catch((error) => {
+          console.log("Erro ao alter um produto.");
+        });
+    } else {
+      //Cadastro:
+      axios
+        .post("http://localhost:8080/api/produto", produtoRequest)
+        .then((response) => {
+          console.log("produto cadastrado com sucesso.");
+        })
+        .catch((error) => {
+          console.log("Erro ao incluir o produto.");
+        });
+    }
   }
   return (
     <div>
@@ -60,14 +91,13 @@ export default function FormProduto() {
                   onChange={(e) => setTitulo(e.target.value)}
                 />
 
-                <Form.Input
-                  required
-                  fluid
-                  label="Código do Produto"
-                  value={codigo}
-                  onChange={(e) => setCodigo(e.target.value)}
-                >
-                  <InputMask required mask="99999-999" />
+                <Form.Input required fluid label="Código do Produto">
+                  <InputMask
+                    required
+                    mask="99999-999"
+                    value={codigo}
+                    onChange={(e) => setCodigo(e.target.value)}
+                  />
                 </Form.Input>
               </Form.Group>
 
