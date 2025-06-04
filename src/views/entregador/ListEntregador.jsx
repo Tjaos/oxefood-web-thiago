@@ -29,14 +29,6 @@ export default function ListEntregador() {
     });
   }
 
-  function formatarData(dataParam) {
-    if (dataParam === null || dataParam === "" || dataParam === undefined) {
-      return "";
-    }
-
-    let arrayData = dataParam.split("-");
-    return arrayData[2] + "/" + arrayData[1] + "/" + arrayData[0];
-  }
   function abrirModal(entregador) {
     setEntregadorSelecionado(entregador);
     setModalAberto(true);
@@ -47,6 +39,7 @@ export default function ListEntregador() {
     setModalAberto(false);
   }
   function confirmaRemover(id) {
+    console.log("Confirma remover id:", id);
     setOpenModal(true);
     setIdRemover(id);
   }
@@ -107,7 +100,7 @@ export default function ListEntregador() {
                     <Table.Cell>{entregador.rg}</Table.Cell>
                     <Table.Cell>{entregador.foneCelular}</Table.Cell>
                     <Table.Cell>{entregador.qtdEntregasRealizadas}</Table.Cell>
-                    <Table.Cell>{entregador.valorPorFrete}</Table.Cell>
+                    <Table.Cell>{entregador.valorFrete}</Table.Cell>
                     <Table.Cell textAlign="center">
                       <Button
                         inverted
@@ -155,17 +148,11 @@ export default function ListEntregador() {
           </div>
         </Container>
       </div>
-      <Modal
-        basic
-        onClose={() => setOpenModal(false)}
-        onOpen={() => setOpenModal(true)}
-        open={openModal}
-      >
+      <Modal basic open={openModal} onClose={() => setOpenModal(false)}>
         <Header icon>
           <Icon name="trash" />
           <div style={{ marginTop: "5%" }}>
-            {" "}
-            Tem certeza que deseja remover esse registro?{" "}
+            Tem certeza que deseja remover esse registro?
           </div>
         </Header>
         <Modal.Actions>
@@ -179,6 +166,40 @@ export default function ListEntregador() {
           </Button>
           <Button color="green" inverted onClick={() => remover()}>
             <Icon name="checkmark" /> Sim
+          </Button>
+        </Modal.Actions>
+      </Modal>
+      <Modal open={modalAberto} onClose={fecharModal} closeIcon size="small">
+        <Header icon="eye" content="Detalhes do Entregador" />
+        <Modal.Content>
+          {entregadorSelecionado ? (
+            <div>
+              <p>
+                <strong>Nome:</strong> {entregadorSelecionado.nome}
+              </p>
+              <p>
+                <strong>RG:</strong> {entregadorSelecionado.rg}
+              </p>
+              <p>
+                <strong>Fone Celular:</strong>{" "}
+                {entregadorSelecionado.foneCelular}
+              </p>
+              <p>
+                <strong>Qtd Entregas Realizadas:</strong>{" "}
+                {entregadorSelecionado.qtdEntregasRealizadas}
+              </p>
+              <p>
+                <strong>Valor Por Frete:</strong>{" "}
+                {entregadorSelecionado.valorFrete}
+              </p>
+            </div>
+          ) : (
+            <p>Carregando...</p>
+          )}
+        </Modal.Content>
+        <Modal.Actions>
+          <Button onClick={fecharModal} color="blue" inverted>
+            <Icon name="checkmark" /> Fechar
           </Button>
         </Modal.Actions>
       </Modal>

@@ -35,7 +35,7 @@ export default function FormEntregador() {
   useEffect(() => {
     if (state != null && state.id != null) {
       axios
-        .get("http://localhost:8080/api/cliente/" + state.id)
+        .get("http://localhost:8080/api/entregador/" + state.id)
         .then((response) => {
           setIdEntregador(response.data.id);
           setNome(response.data.nome);
@@ -45,14 +45,15 @@ export default function FormEntregador() {
           setFoneCelular(response.data.foneCelular);
           setFoneFixo(response.data.foneFixo);
           setQtdEntregasRealizadas(response.data.qtdEntregasRealizadas);
-          setValorPorFrete(response.data.valorPorFrete);
-          setRua(response.data.rua);
-          setNumero(response.data.numero);
-          setBairro(response.data.bairro);
-          setCidade(response.data.cidade);
-          setCep(response.data.cep);
-          setUf(response.data.uf);
-          setComplemento(response.data.complemento);
+          setValorPorFrete(response.data.valorFrete);
+          setRua(response.data.enderecoRua);
+          setNumero(response.data.enderecoNumero);
+          setBairro(response.data.enderecoBairro);
+          setCidade(response.data.enderecoCidade);
+          setCep(response.data.enderecoCep);
+          setUf(response.data.enderecoUf);
+          setComplemento(response.data.enderecoComplemento);
+          setAtivo(true);
         });
     }
   }, [state]);
@@ -66,19 +67,19 @@ export default function FormEntregador() {
       foneCelular: foneCelular,
       foneFixo: foneFixo,
       qtdEntregasRealizadas: qtdEntregasRealizadas,
-      valorPorFrete: valorPorFrete,
-      rua: rua,
-      numero: numero,
-      bairro: bairro,
-      cidade: cidade,
-      cep: cep,
-      uf: uf,
-      complemento: complemento,
+      valorFrete: valorPorFrete,
+      enderecoRua: rua,
+      enderecoNumero: numero,
+      enderecoBairro: bairro,
+      enderecoCidade: cidade,
+      enderecoCep: cep,
+      enderecoUf: uf,
+      enderecoComplemento: complemento,
       ativo: ativo,
     };
 
     if (idEntregador != null) {
-      //Alteração:
+      //alteração
       axios
         .put(
           "http://localhost:8080/api/entregador/" + idEntregador,
@@ -180,12 +181,12 @@ export default function FormEntregador() {
                   value={qtdEntregasRealizadas}
                   onChange={(e) => setQtdEntregasRealizadas(e.target.value)}
                 />
-                <Form.Input fluid label="Valor Por Frete" />
-                <InputMask
-                  mask="99.99"
-                  value={valorPorFrete}
-                  onChange={(e) => setValorPorFrete(e.target.value)}
-                />
+                <Form.Input fluid label="Valor Por Frete">
+                  <InputMask
+                    value={valorPorFrete}
+                    onChange={(e) => setValorPorFrete(e.target.value)}
+                  />
+                </Form.Input>
               </Form.Group>
 
               <Form.Group widths={"equal"}>
