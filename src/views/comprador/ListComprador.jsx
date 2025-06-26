@@ -13,7 +13,7 @@ import {
 import MenuSistema from "../../MenuSistema";
 import { notifyError, notifySuccess } from "../util/util";
 
-export default function ListProduto() {
+export default function ListComprador() {
   const [lista, setLista] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [idRemover, setIdRemover] = useState();
@@ -23,46 +23,53 @@ export default function ListProduto() {
   }, []);
 
   function carregarLista() {
-    axios.get("http://localhost:8080/api/produto").then((response) => {
+    axios.get("http://localhost:8080/api/comprador").then((response) => {
       setLista(response.data);
     });
   }
 
+  /*  function formatarData(dataParam) {
+    if (dataParam === null || dataParam === "" || dataParam === undefined) {
+      return "";
+    }
+
+    let arrayData = dataParam.split("-");
+    return arrayData[2] + "/" + arrayData[1] + "/" + arrayData[0];
+  }*/
   function confirmaRemover(id) {
     setOpenModal(true);
     setIdRemover(id);
   }
   async function remover() {
     await axios
-      .delete("http://localhost:8080/api/produto/" + idRemover)
+      .delete("http://localhost:8080/api/comprador/" + idRemover)
       .then((response) => {
-        console.log("Produto removido com sucesso.");
-        notifySuccess("Produto removido com sucesso.");
+        console.log("Comprador removido com sucesso.");
+        notifySuccess("Comprador removido com sucesso.");
 
-        axios.get("http://localhost:8080/api/produto").then((response) => {
+        axios.get("http://localhost:8080/api/comprador").then((response) => {
           setLista(response.data);
         });
       })
       .catch((error) => {
-        if (error.response.data.errors !== undefined) {
+        if (error.response.data.errors != undefined) {
           for (let i = 0; i < error.response.data.errors.length; i++) {
             notifyError(error.response.data.errors[i].defaultMessage);
           }
         } else {
           notifyError(error.response.data.message);
         }
-
-        console.log("Erro ao remover um produto.");
+        console.log("Erro ao remover um comprador.");
       });
     setOpenModal(false);
   }
 
   return (
     <div>
-      <MenuSistema tela={"produto"} />
+      <MenuSistema tela={"comprador"} />
       <div style={{ marginTop: "3%" }}>
         <Container textAlign="justified">
-          <h2> Produto </h2>
+          <h2> Comprador </h2>
           <Divider />
 
           <div style={{ marginTop: "4%" }}>
@@ -73,7 +80,7 @@ export default function ListProduto() {
               icon="clipboard outline"
               floated="right"
               as={Link}
-              to="/form-produto"
+              to="/form-comprador"
             />
             <br />
             <br />
@@ -82,44 +89,42 @@ export default function ListProduto() {
             <Table color="orange" sortable celled>
               <Table.Header>
                 <Table.Row>
-                  <Table.HeaderCell>Título</Table.HeaderCell>
-                  <Table.HeaderCell>Categoria</Table.HeaderCell>
-                  <Table.HeaderCell>Descrição</Table.HeaderCell>
-                  <Table.HeaderCell>Código do Produto</Table.HeaderCell>
-                  <Table.HeaderCell>Valor Unitário</Table.HeaderCell>
+                  <Table.HeaderCell>Nome</Table.HeaderCell>
+                  <Table.HeaderCell>Segmento</Table.HeaderCell>
+                  <Table.HeaderCell>Endereço comercial</Table.HeaderCell>
                   <Table.HeaderCell>
-                    Tempo de entrega mínimo (min)
+                    quantidade média de compras no mês
                   </Table.HeaderCell>
-                  <Table.HeaderCell>
-                    Tempo de entrega máximo (min)
-                  </Table.HeaderCell>
+                  <Table.HeaderCell>Comissão</Table.HeaderCell>
+                  <Table.HeaderCell>Endereço residencial</Table.HeaderCell>
+                  <Table.HeaderCell>Contratado em</Table.HeaderCell>
                   <Table.HeaderCell textAlign="center">Ações</Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
 
               <Table.Body>
-                {lista.map((produto) => (
-                  <Table.Row key={produto.id}>
-                    <Table.Cell>{produto.titulo}</Table.Cell>
+                {lista.map((comprador) => (
+                  <Table.Row key={comprador.id}>
+                    <Table.Cell>{comprador.nome}</Table.Cell>
                     <Table.Cell>
-                      {produto.categoria ? produto.categoria.descricao : ""}
+                      {comprador.segmento ? comprador.segmento.descricao : ""}
                     </Table.Cell>
-                    <Table.Cell>{produto.descricao}</Table.Cell>
-                    <Table.Cell>{produto.codigo}</Table.Cell>
-                    <Table.Cell>{produto.valorUnitario}</Table.Cell>
-                    <Table.Cell>{produto.tempoEntregaMinimo}</Table.Cell>
-                    <Table.Cell>{produto.tempoEntregaMaximo}</Table.Cell>
+                    <Table.Cell>{comprador.enderecoComercial}</Table.Cell>
+                    <Table.Cell>{comprador.qtdComprasMediasMes}</Table.Cell>
+                    <Table.Cell>{comprador.comissao}</Table.Cell>
+                    <Table.Cell>{comprador.enderecoResidencial}</Table.Cell>
+                    <Table.Cell>{comprador.contratadoEm}</Table.Cell>
                     <Table.Cell textAlign="center">
                       <Button
                         inverted
                         circular
                         color="green"
-                        title="Clique aqui para editar os dados deste produto"
+                        title="Clique aqui para editar os dados deste comprador"
                         icon
                       >
                         <Link
-                          to="/form-produto"
-                          state={{ id: produto.id }}
+                          to="/form-comprador"
+                          state={{ id: comprador.id }}
                           style={{ color: "green" }}
                         >
                           {" "}
@@ -131,9 +136,9 @@ export default function ListProduto() {
                         inverted
                         circular
                         color="red"
-                        title="Clique aqui para remover este produto"
+                        title="Clique aqui para remover este comprador"
                         icon
-                        onClick={(e) => confirmaRemover(produto.id)}
+                        onClick={(e) => confirmaRemover(comprador.id)}
                       >
                         <Icon name="trash" />
                       </Button>

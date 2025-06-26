@@ -4,6 +4,7 @@ import { Button, Container, Divider, Form, Icon } from "semantic-ui-react";
 import axios from "axios";
 import MenuSistema from "../../MenuSistema";
 import { Link, useLocation } from "react-router-dom";
+import { notifyError, notifySuccess } from "../util/util";
 
 export default function FormCliente() {
   const { state } = useLocation();
@@ -50,8 +51,16 @@ export default function FormCliente() {
         .put("http://localhost:8080/api/cliente/" + idCliente, clienteRequest)
         .then((response) => {
           console.log("Cliente alterado com sucesso.");
+          notifySuccess("Cliente alterado com sucesso.");
         })
         .catch((error) => {
+          if (error.response.data.errors !== undefined) {
+            for (let i = 0; i < error.response.data.errors.length; i++) {
+              notifyError(error.response.data.errors[i].defaultMessage);
+            }
+          } else {
+            notifyError(error.response.data.message);
+          }
           console.log("Erro ao alter um cliente.");
         });
     } else {
@@ -59,9 +68,18 @@ export default function FormCliente() {
       axios
         .post("http://localhost:8080/api/cliente", clienteRequest)
         .then((response) => {
+          notifySuccess("Cliente cadastrado com sucesso.");
           console.log("Cliente cadastrado com sucesso.");
         })
         .catch((error) => {
+          if (error.response.data.errors !== undefined) {
+            for (let i = 0; i < error.response.data.errors.length; i++) {
+              notifyError(error.response.data.errors[i].defaultMessage);
+            }
+          } else {
+            notifyError(error.response.data.message);
+          }
+
           console.log("Erro ao incluir o cliente.");
         });
     }

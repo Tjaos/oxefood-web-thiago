@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Container, Divider, Form, Icon } from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
 import { Link, useLocation } from "react-router-dom";
+import { notifyError, notifySuccess } from "../util/util";
 
 export default function FormProduto() {
   const [codigo, setCodigo] = useState();
@@ -59,9 +60,17 @@ export default function FormProduto() {
         .put("http://localhost:8080/api/produto/" + idProduto, produtoRequest)
         .then((response) => {
           console.log("Produto alterado com sucesso.");
+          notifySuccess("Produto alterado com sucesso.");
         })
         .catch((error) => {
           console.log("Erro ao alterar um produto.");
+          if (error.response.data.errors !== undefined) {
+            for (let i = 0; i < error.response.data.errors.length; i++) {
+              notifyError(error.response.data.errors[i].defaultMessage);
+            }
+          } else {
+            notifyError(error.response.data.message);
+          }
         });
     } else {
       //Cadastro:
@@ -69,9 +78,17 @@ export default function FormProduto() {
         .post("http://localhost:8080/api/produto", produtoRequest)
         .then((response) => {
           console.log("Produto cadastrado com sucesso.");
+          notifySuccess("Produto cadastrado com sucesso.");
         })
         .catch((error) => {
           console.log("Erro ao incluir o produto.");
+          if (error.response.data.errors !== undefined) {
+            for (let i = 0; i < error.response.data.errors.length; i++) {
+              notifyError(error.response.data.errors[i].defaultMessage);
+            }
+          } else {
+            notifyError(error.response.data.message);
+          }
         });
     }
   }
