@@ -23,8 +23,8 @@ export default function FormCliente() {
         .then((response) => {
           setIdCliente(response.data.id);
           setNome(response.data.nome);
-          setCpf(formatarData(response.data.cpf));
-          setDataNascimento(response.data.dataNascimento);
+          setCpf(response.data.cpf);
+          setDataNascimento(formatarData(response.data.dataNascimento));
           setFoneCelular(response.data.foneCelular);
           setFoneFixo(response.data.foneFixo);
         });
@@ -35,6 +35,8 @@ export default function FormCliente() {
     if (dataParam === null || dataParam === "" || dataParam === undefined) {
       return "";
     }
+    let arrayData = dataParam.split("-");
+    return arrayData[2] + "/" + arrayData[1] + "/" + arrayData[0];
   }
   function salvar() {
     let clienteRequest = {
