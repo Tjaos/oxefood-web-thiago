@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Container, Divider, Form, Icon } from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
 import { Link, useLocation } from "react-router-dom";
-import { notifyError, notifySuccess } from "../util/util";
+import { notifyError, notifySuccess } from "../util/Util";
 
 export default function FormProduto() {
   const [codigo, setCodigo] = useState();

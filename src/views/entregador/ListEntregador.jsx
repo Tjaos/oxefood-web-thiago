@@ -13,7 +13,7 @@ import {
   Table,
 } from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
-import { notifyError, notifySuccess } from "../util/util";
+import { notifyError, notifySuccess } from "../util/Util";
 
 class ListEntregador extends React.Component {
   state = {

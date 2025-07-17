@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Container, Divider, Form, Icon } from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
-import { notifyError, notifySuccess } from "../util/util";
 
 const ufList = [
   {
@@ -32,43 +31,15 @@ export default function FormEntregador() {
   const [foneCelular, setFoneCelular] = useState();
   const [foneFixo, setFoneFixo] = useState();
   const [qtdEntregasRealizadas, setQtdEntregasRealizadas] = useState();
-  const [valorPorFrete, setValorPorFrete] = useState();
-  const [rua, setRua] = useState();
-  const [numero, setNumero] = useState();
-  const [bairro, setBairro] = useState();
-  const [cidade, setCidade] = useState();
-  const [cep, setCep] = useState();
-  const [uf, setUf] = useState();
-  const [complemento, setComplemento] = useState();
-  const [ativo, setAtivo] = useState(false);
-  const { state } = useLocation();
-  const [idEntregador, setIdEntregador] = useState();
-
-  useEffect(() => {
-    if (state != null && state.id != null) {
-      axios
-        .get("http://localhost:8080/api/entregador/" + state.id)
-        .then((response) => {
-          setIdEntregador(response.data.id);
-          setNome(response.data.nome);
-          setCpf(response.data.cpf);
-          setRg(response.data.rg);
-          setDataNascimento(response.data.dataNascimento);
-          setFoneCelular(response.data.foneCelular);
-          setFoneFixo(response.data.foneFixo);
-          setQtdEntregasRealizadas(response.data.qtdEntregasRealizadas);
-          setValorPorFrete(response.data.valorFrete);
-          setRua(response.data.enderecoRua);
-          setNumero(response.data.enderecoNumero);
-          setBairro(response.data.enderecoBairro);
-          setCidade(response.data.enderecoCidade);
-          setCep(response.data.enderecoCep);
-          setUf(response.data.enderecoUf);
-          setComplemento(response.data.enderecoComplemento);
-          setAtivo(true);
-        });
-    }
-  }, [state]);
+  const [valorFrete, setValorFrete] = useState();
+  const [enderecoRua, setEnderecoRua] = useState();
+  const [enderecoNumero, setEnderecoNumero] = useState();
+  const [enderecoBairro, setEnderecoBairro] = useState();
+  const [enderecoCep, setEnderecoCep] = useState();
+  const [enderecoCidade, setEnderecoCidade] = useState();
+  const [enderecoEstado, setEnderecoEstado] = useState();
+  const [enderecoComplemento, setEnderecoComplemento] = useState();
+  const [ativo, setAtivo] = useState(true);
 
   function salvar() {
     let entregadorRequest = {
@@ -78,32 +49,24 @@ export default function FormEntregador() {
       dataNascimento: dataNascimento,
       foneCelular: foneCelular,
       foneFixo: foneFixo,
-      qtdEntregasRealizadas: qtdEntregasRealizadas,
-      valorFrete: valorPorFrete,
-      enderecoRua: rua,
-      enderecoNumero: numero,
-      enderecoBairro: bairro,
-      enderecoCidade: cidade,
-      enderecoCep: cep,
-      enderecoUf: uf,
-      enderecoComplemento: complemento,
+      qtdEntregasRealizadas: parseInt(qtdEntregasRealizadas),
+      valorFrete: parseFloat(valorFrete),
+      enderecoRua: enderecoRua,
+      enderecoNumero: enderecoNumero,
+      enderecoBairro: enderecoBairro,
+      enderecoCep: enderecoCep,
+      enderecoCidade: enderecoCidade,
+      enderecoUf: enderecoEstado,
+      enderecoComplemento: enderecoComplemento,
       ativo: ativo,
     };
 
     axios
       .post("http://localhost:8087/api/entregador", entregadorRequest)
       .then((response) => {
-        notifySuccess("Entregador cadastrado com sucesso.");
         console.log("Entregador cadastrado com sucesso.");
       })
       .catch((error) => {
-        if (error.response.data.errors !== undefined) {
-          for (let i = 0; i < error.response.data.errors.length; i++) {
-            notifyError(error.response.data.errors[i].defaultMessage);
-          }
-        } else {
-          notifyError(error.response.data.message);
-        }
         console.log("Erro ao incluir o Entregador.");
       });
   }
@@ -188,12 +151,14 @@ export default function FormEntregador() {
                   value={qtdEntregasRealizadas}
                   onChange={(e) => setQtdEntregasRealizadas(e.target.value)}
                 />
-                <Form.Input fluid label="Valor Por Frete">
-                  <InputMask
-                    value={valorPorFrete}
-                    onChange={(e) => setValorPorFrete(e.target.value)}
-                  />
-                </Form.Input>
+
+                <Form.Input
+                  fluid
+                  label="Valor Por Frete"
+                  width={3}
+                  value={valorFrete}
+                  onChange={(e) => setValorFrete(e.target.value)}
+                />
               </Form.Group>
 
               <Form.Group>

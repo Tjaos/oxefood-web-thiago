@@ -4,7 +4,7 @@ import { Button, Container, Divider, Form, Icon } from "semantic-ui-react";
 
 import { Link, useLocation } from "react-router-dom";
 import MenuSistema from "../../MenuSistema";
-import { notifyError, notifySuccess } from "../util/util";
+import { notifyError, notifySuccess } from "../util/Util";
 
 export default function FormComprador() {
   const [nome, setNome] = useState();

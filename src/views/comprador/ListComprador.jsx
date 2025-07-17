@@ -11,7 +11,7 @@ import {
   Table,
 } from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
-import { notifyError, notifySuccess } from "../util/util";
+import { notifyError, notifySuccess } from "../util/Util";
 
 export default function ListComprador() {
   const [lista, setLista] = useState([]);

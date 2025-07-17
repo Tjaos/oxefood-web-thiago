@@ -5,18 +5,25 @@ import {
   Button,
   Container,
   Divider,
+  Form,
   Header,
   Icon,
+  Menu,
   Modal,
+  Segment,
   Table,
 } from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
-import { notifyError, notifySuccess } from "../util/util";
+import { notifyError, notifySuccess } from "../util/Util";
 
 export default function ListCliente() {
   const [lista, setLista] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [idRemover, setIdRemover] = useState();
+  const [menuFiltro, setMenuFiltro] = useState();
+  const [cpf, setCpf] = useState();
+  const [nome, setNome] = useState();
+  const [listaNomeCliente, setListaNomeCliente] = useState([]);
 
   useEffect(() => {
     carregarLista();
@@ -25,6 +32,15 @@ export default function ListCliente() {
   function carregarLista() {
     axios.get("http://localhost:8080/api/cliente").then((response) => {
       setLista(response.data);
+    });
+    axios.get("http://localhost:8080/api/cliente").then((response) => {
+      const dropDownNomes = [];
+      dropDownNomes.push({ text: "", value: "" });
+      response.data.map((c) =>
+        dropDownNomes.push({ text: c.nome, value: c.id })
+      );
+
+      setListaNomeCliente(dropDownNomes);
     });
   }
 
@@ -64,6 +80,41 @@ export default function ListCliente() {
     setOpenModal(false);
   }
 
+  function handleMenuFiltro() {
+    if (menuFiltro === true) {
+      setMenuFiltro(false);
+    } else {
+      setMenuFiltro(true);
+    }
+  }
+
+  function handleChangeCpf(value) {
+    filtrarCliente(value, nome, undefined);
+  }
+
+  function handleChangeNome(value) {
+    filtrarCliente(cpf, value, undefined);
+  }
+
+  async function filtrarCliente(codigoParam, tituloParam, idCategoriaParam) {
+    let formData = new FormData();
+
+    if (codigoParam !== undefined) {
+      setCpf(codigoParam);
+      formData.append("codigo", codigoParam);
+    }
+    if (tituloParam !== undefined) {
+      setNome(tituloParam);
+      formData.append("titulo", tituloParam);
+    }
+
+    await axios
+      .post("http://localhost:8080/api/cliente/filtrar", formData)
+      .then((response) => {
+        setListaNomeCliente(response.data);
+      });
+  }
+
   return (
     <div>
       <MenuSistema tela={"cliente"} />
@@ -73,6 +124,17 @@ export default function ListCliente() {
           <Divider />
 
           <div style={{ marginTop: "4%" }}>
+            <Menu compact>
+              <Menu.Item
+                name="menuFiltro"
+                active={menuFiltro === true}
+                onClick={() => handleMenuFiltro()}
+              >
+                <Icon name="filter" />
+                Filtrar
+              </Menu.Item>
+            </Menu>
+
             <Button
               label="Novo"
               circular
@@ -82,6 +144,34 @@ export default function ListCliente() {
               as={Link}
               to="/form-cliente"
             />
+            {menuFiltro ? (
+              <Segment>
+                <Form className="form-filtros">
+                  <Form.Input
+                    icon="search"
+                    value={cpf}
+                    onChange={(e) => handleChangeCpf(e.target.value)}
+                    label="CPF do cliente"
+                    placeholder="Filtrar por CPF do cliente"
+                    labelPosition="left"
+                    width={11}
+                  />
+                  <Form.Group widths="equal">
+                    <Form.Input
+                      icon="search"
+                      value={nome}
+                      onChange={(e) => handleChangeNome(e.target.value)}
+                      label="Nome"
+                      placeholder="Filtrar por nome"
+                      labelPosition="left"
+                    />
+                  </Form.Group>
+                </Form>
+              </Segment>
+            ) : (
+              ""
+            )}
+
             <br />
             <br />
             <br />
